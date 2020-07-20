@@ -1,1 +1,1 @@
-##The Gauntlet##
+# The Gauntlet
