@@ -62,7 +62,20 @@ const hero = new Player(
   'Knight',
   'Basic Sword',
   'Basic Shield',
-  ['Potion', 'Potion', 'Bomb'],
+  [
+    {
+      name: 'Potion',
+      count: 2,
+      value: 25,
+      type: 'Light',
+    },
+    {
+      name: 'Deadly Spell',
+      count: 1,
+      value: 25,
+      type: 'Dark',
+    },
+  ],
   12,
   2,
   2,
@@ -101,6 +114,8 @@ class Enemy {
     return this.attackAtr * randomNum + this.attMod;
   }
 
+  useItem(item) {}
+
   heal() {
     const randomNum = generateRandomNum();
     const healingPoints = this.defMod * randomNum;
@@ -121,7 +136,20 @@ class Enemy {
 const goblin = new Enemy(
   'Goblin',
   'Basic Club',
-  ['Potion', 'Potion', 'Deadly Spell'],
+  [
+    {
+      name: 'Potion',
+      count: 2,
+      value: 25,
+      type: 'Light',
+    },
+    {
+      name: 'Deadly Spell',
+      count: 1,
+      value: 25,
+      type: 'Dark',
+    },
+  ],
   4,
   3,
   0,
