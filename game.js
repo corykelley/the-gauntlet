@@ -1,9 +1,15 @@
 //Create game variables including classes for players and enemies.
-let play = true;
-let attack = true;
+const game = {
+  play: true,
+  attack: true,
+  battleOne: true,
+  currentTurn: 'player',
+};
 
-//Attack Modifier: Int between 5 and 30
-//Defense Modifier: Int between 2 and 5
+//Attack Atr: Int between 1 and 10
+//Defense Atr: Int between 1 and 10
+//Attack Modifier: Int between 1 and 5
+//Defense Modifier: Int between 1 and 5
 class Player {
   constructor(
     name,
@@ -32,9 +38,19 @@ class Player {
     this.defMod = defMod;
   }
 
-  attack() {
-    const randomNum = generateRandomNum();
-    return this.attackAtr * randomNum + this.attMod;
+  attack(enemy) {
+    const enemyDefense = enemy.defMod + enemy.defenseAtr;
+    const roll = dieRolls.roll20();
+    console.log(`You rolled a ${roll}`);
+    if (roll + this.attMod > enemyDefense) {
+      const enemyHealthLost = roll + this.attackAtr;
+      enemy.health -= enemyHealthLost;
+      alert(`You struck the ${enemy.name}, he lost ${enemyHealthLost} health!`);
+      console.log(`Hero Health: ${this.health}`);
+      console.log(`${enemy.name} Health: ${enemy.health}`);
+    } else {
+      alert(`You missed!`);
+    }
   }
 
   useItem(item) {
@@ -47,7 +63,6 @@ class Player {
           alert('You dont have enough to use that');
           return;
         } else {
-          this.inventory[i].count--;
           console.log(`Count gone down`, this.inventory);
           if (itemToUse.type === 'Light') {
             this.heal(itemToUse);
@@ -61,11 +76,15 @@ class Player {
 
   heal(item) {
     const healingPoints = item.value;
-    if (this.health + healingPoints > 100) {
+    if (this.health === 100) {
+      alert(`You're already at full health!`);
+    } else if (this.health + healingPoints > 100) {
       this.health = 100;
       alert(
         `You've healed yourself by ${healingPoints} points. Your health is now at ${this.health}.`
       );
+      item.count--;
+      console.log(this.inventory);
     } else {
       this.health += healingPoints;
       alert(
@@ -73,26 +92,6 @@ class Player {
       );
     }
   }
-
-  // heal() {
-  //   if (this.health === 100) {
-  //     alert(`You're already at full health!`);
-  //   } else {
-  //     const randomNum = generateRandomNum();
-  //     const healingPoints = this.defMod * randomNum;
-  //     if (this.health + healingPoints > 100) {
-  //       this.health = 100;
-  //       alert(
-  //         `You've healed yourself by ${healingPoints} points. Your health is now at ${this.health}.`
-  //       );
-  //     } else {
-  //       this.health += healingPoints;
-  //       alert(
-  //         `You've healed yourself by ${healingPoints} points. Your health is now at ${this.health}.`
-  //       );
-  //     }
-  //   }
-  // }
 }
 
 const hero = new Player(
@@ -113,12 +112,12 @@ const hero = new Player(
       type: 'Dark',
     },
   ],
-  12,
+  9,
   2,
   2,
   3,
   50,
-  12,
+  4,
   2
 );
 
@@ -147,8 +146,17 @@ class Enemy {
   }
 
   attack() {
-    const randomNum = generateRandomNum();
-    return this.attackAtr * randomNum + this.attMod;
+    const playerDefense = hero.defMod + hero.defenseAtr;
+    const roll = dieRolls.roll20();
+    if (roll + this.attMod > playerDefense) {
+      const playerHealthLost = roll + this.attackAtr;
+      hero.health -= playerHealthLost;
+      alert(
+        `The ${this.name} struck you, you lost ${playerHealthLost} health!`
+      );
+      console.log(`Hero Health: ${hero.health}`);
+      console.log(`${this.name} Health: ${this.health}`);
+    }
   }
 
   useItem(item) {
@@ -210,33 +218,41 @@ const goblin = new Enemy(
   3,
   0,
   3,
-  5,
+  2,
   2
 );
 
-const generateRandomNum = () => {
-  return Math.floor(Math.random() * 10 + 1);
+const dieRolls = {
+  roll20() {
+    return Math.floor(Math.random() * 20 + 1);
+  },
 };
 
-const compareRolls = (playerRoll, enemyRoll, player, enemy) => {
-  if (playerRoll > enemyRoll) {
-    const goblinHealthLost =
-      Math.round(playerRoll / enemy.defenseAtr) + enemy.defMod;
-    enemy.health -= goblinHealthLost;
-    alert(`You struck the goblin, he lost ${goblinHealthLost} health!`);
-    console.log('Hero Health', player.health);
-    console.log('Goblin Health', enemy.health);
-  } else if (playerRoll < enemyRoll) {
-    const heroHealthLost =
-      Math.round(enemyRoll / player.defenseAtr) + player.defMod;
-    player.health -= heroHealthLost;
-    alert(`The goblin struck you, you lost ${heroHealthLost} health!`);
-    console.log('Hero Health', player.health);
-    console.log('Goblin Health', enemy.health);
-  } else {
-    alert(`Your weapons meet and you both fly backwards!`);
-  }
+const changeTurn = () => {
+  game.currentTurn === 'player'
+    ? (game.currentTurn = 'enemy')
+    : (game.currentTurn = 'player');
 };
+
+// const compareRolls = (playerRoll, enemyRoll, player, enemy) => {
+//   if (playerRoll > enemyRoll) {
+//     const goblinHealthLost =
+//       Math.round(playerRoll / enemy.defenseAtr) + enemy.defMod;
+//     enemy.health -= goblinHealthLost;
+//     alert(`You struck the goblin, he lost ${goblinHealthLost} health!`);
+//     console.log('Hero Health', player.health);
+//     console.log('Goblin Health', enemy.health);
+//   } else if (playerRoll < enemyRoll) {
+//     const heroHealthLost =
+//       Math.round(enemyRoll / player.defenseAtr) + player.defMod;
+//     player.health -= heroHealthLost;
+//     alert(`The goblin struck you, you lost ${heroHealthLost} health!`);
+//     console.log('Hero Health', player.health);
+//     console.log('Goblin Health', enemy.health);
+//   } else {
+//     alert(`Your weapons meet and you both fly backwards!`);
+//   }
+// };
 
 const battle = (player, enemy) => {
   let userInput = prompt(
@@ -267,18 +283,18 @@ const battle = (player, enemy) => {
     if (enemy.health < 20) {
       randomNum = generateRandomNum();
       if (randomNum > 3) {
-        player.heal();
-        enemy.heal();
+        player.useItem('Potion');
+        enemy.useItem('Potion');
         return;
       } else {
-        player.heal();
+        player.useItem('Potion');
         const heroRoll = player.defenseAtr + player.defMod;
         const goblinRoll = enemy.attack();
         console.log('Hero roll', heroRoll);
         console.log('Goblin Roll', goblinRoll);
       }
     } else {
-      player.heal();
+      player.useItem('Potion');
       const heroRoll = player.defenseAtr + player.defMod;
       const goblinRoll = enemy.attack();
       console.log('Hero roll', heroRoll);
@@ -295,16 +311,45 @@ const battle = (player, enemy) => {
   }
 };
 
+const playerTurn = () => {
+  let userInput = prompt(
+    `You've encountered a ${currentEnemy.name}, what will you do? OPTIONS: Attack or Use Item?`
+  );
+  userInput = userInput.toLowerCase();
+  if (userInput === 'attack') {
+    hero.attack(currentEnemy);
+    changeTurn();
+  }
+};
+
+const enemyTurn = () => {
+  // if (currentEnemy.health > 30) {
+  alert(`The ${currentEnemy.name} is planning his next move!`);
+  currentEnemy.attack();
+  changeTurn();
+  // } else {
+
+  // }
+};
+
+let currentEnemy = goblin;
+
 const mainGame = () => {
-  alert(`You have encountered a Goblin! Time to fight!`);
-  while (play) {
-    if (goblin.health <= 0 || hero.health <= 0) {
-      hero.health > goblin.health
-        ? alert(`The day is yours!`)
-        : alert(`You've been defeated...`);
-      play = false;
-    } else {
-      battle(hero, goblin);
+  alert(`THE GAME HAS STARTED!`);
+  while (game.play) {
+    while (game.battleOne) {
+      if (currentEnemy.health <= 0 || hero.health <= 0) {
+        hero.health > currentEnemy.health
+          ? alert(`The day is yours!`)
+          : alert(`You've been defeated...`);
+        game.battleOne = false;
+      } else {
+        if (game.currentTurn === 'player') {
+          playerTurn();
+        } else {
+          enemyTurn();
+        }
+      }
     }
   }
 };
