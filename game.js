@@ -55,6 +55,7 @@ class Player {
 
   useItem(item) {
     let itemToUse = '';
+    item = item[0].toUpperCase() + item.split('').splice(1).join('');
     for (let i = 0; i < this.inventory.length; i++) {
       if (this.inventory[i].name === item) {
         itemToUse = this.inventory[i];
@@ -90,6 +91,7 @@ class Player {
       alert(
         `You've healed yourself by ${healingPoints} points. Your health is now at ${this.health}.`
       );
+      item.count--;
     }
   }
 }
@@ -319,6 +321,20 @@ const playerTurn = () => {
   if (userInput === 'attack') {
     hero.attack(currentEnemy);
     changeTurn();
+  } else if (userInput === 'use item') {
+    let playerInventory = hero.inventory.map(el => {
+      return el.count !== 0 ? el.name : null;
+    });
+    playerInventory.length > 1
+      ? (playerInventory = playerInventory.join(', '))
+      : (playerInventory = playerInventory);
+    console.log(playerInventory);
+    userInput = prompt(
+      `What item would you like to use? OPTIONS: ${playerInventory}`
+    );
+    userInput = userInput.toLowerCase();
+    hero.useItem(`${userInput}`);
+    changeTurn();
   }
 };
 
@@ -338,11 +354,15 @@ const mainGame = () => {
   alert(`THE GAME HAS STARTED!`);
   while (game.play) {
     while (game.battleOne) {
+      alert(
+        `${hero.name} has ${hero.health} points of health. ${currentEnemy.name} has ${currentEnemy.health} points of health.`
+      );
       if (currentEnemy.health <= 0 || hero.health <= 0) {
         hero.health > currentEnemy.health
           ? alert(`The day is yours!`)
           : alert(`You've been defeated...`);
         game.battleOne = false;
+        game.play = false;
       } else {
         if (game.currentTurn === 'player') {
           playerTurn();
