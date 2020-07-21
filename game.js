@@ -37,25 +37,62 @@ class Player {
     return this.attackAtr * randomNum + this.attMod;
   }
 
-  heal() {
-    if (this.health === 100) {
-      alert(`You're already at full health!`);
-    } else {
-      const randomNum = generateRandomNum();
-      const healingPoints = this.defMod * randomNum;
-      if (this.health + healingPoints > 100) {
-        this.health = 100;
-        alert(
-          `You've healed yourself by ${healingPoints} points. Your health is now at ${this.health}.`
-        );
-      } else {
-        this.health += healingPoints;
-        alert(
-          `You've healed yourself by ${healingPoints} points. Your health is now at ${this.health}.`
-        );
+  useItem(item) {
+    let itemToUse = '';
+    for (let i = 0; i < this.inventory.length; i++) {
+      if (this.inventory[i].name === item) {
+        itemToUse = this.inventory[i];
+        console.log(itemToUse.count);
+        if (itemToUse.count === 0) {
+          alert('You dont have enough to use that');
+          return;
+        } else {
+          this.inventory[i].count--;
+          console.log(`Count gone down`, this.inventory);
+          if (itemToUse.type === 'Light') {
+            this.heal(itemToUse);
+          } else if (itemToUse.type === 'Dark') {
+            alert(`You use ${itemToUse.name} it was effective!`);
+          }
+        }
       }
     }
   }
+
+  heal(item) {
+    const healingPoints = item.value;
+    if (this.health + healingPoints > 100) {
+      this.health = 100;
+      alert(
+        `You've healed yourself by ${healingPoints} points. Your health is now at ${this.health}.`
+      );
+    } else {
+      this.health += healingPoints;
+      alert(
+        `You've healed yourself by ${healingPoints} points. Your health is now at ${this.health}.`
+      );
+    }
+  }
+
+  // heal() {
+  //   if (this.health === 100) {
+  //     alert(`You're already at full health!`);
+  //   } else {
+  //     const randomNum = generateRandomNum();
+  //     const healingPoints = this.defMod * randomNum;
+  //     if (this.health + healingPoints > 100) {
+  //       this.health = 100;
+  //       alert(
+  //         `You've healed yourself by ${healingPoints} points. Your health is now at ${this.health}.`
+  //       );
+  //     } else {
+  //       this.health += healingPoints;
+  //       alert(
+  //         `You've healed yourself by ${healingPoints} points. Your health is now at ${this.health}.`
+  //       );
+  //     }
+  //   }
+  // }
 }
 
 const hero = new Player(
@@ -70,8 +107,8 @@ const hero = new Player(
       type: 'Light',
     },
     {
-      name: 'Deadly Spell',
-      count: 1,
+      name: 'Small Bomb',
+      count: 2,
       value: 25,
       type: 'Dark',
     },
@@ -114,11 +151,30 @@ class Enemy {
     return this.attackAtr * randomNum + this.attMod;
   }
 
-  useItem(item) {}
+  useItem(item) {
+    let itemToUse = '';
+    for (let i = 0; i < this.inventory.length; i++) {
+      if (this.inventory[i].name === item) {
+        itemToUse = this.inventory[i];
+        console.log(itemToUse.count);
+        if (itemToUse.count === 0) {
+          alert('You dont have enough to use that');
+          return;
+        } else {
+          this.inventory[i].count--;
+          console.log(`Count gone down`, this.inventory);
+          if (itemToUse.type === 'Light') {
+            this.heal(itemToUse);
+          } else if (itemToUse.type === 'Dark') {
+            alert(`You use ${itemToUse.name} it was effective!`);
+          }
+        }
+      }
+    }
+  }
 
-  heal() {
-    const randomNum = generateRandomNum();
-    const healingPoints = this.defMod * randomNum;
+  heal(item) {
+    const healingPoints = item.value;
     if (this.health + healingPoints > 100) {
       this.health = 100;
       alert(
@@ -192,7 +248,8 @@ const battle = (player, enemy) => {
     if (enemy.health < 50) {
       let randomNum = generateRandomNum();
       if (randomNum % 2 === 0) {
-        enemy.heal();
+        enemy.useItem('Potion');
+        console.log('Enemy is using a potion');
         randomNum = generateRandomNum();
         randomNum % 2 === 1 ? (goblinRoll = heroRoll) : (goblinRoll = 0);
         compareRolls(heroRoll, goblinRoll, player, enemy);
