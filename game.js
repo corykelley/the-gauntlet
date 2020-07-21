@@ -9,6 +9,7 @@ class Player {
     name,
     startingWeapon,
     startingShield,
+    inventory,
     attackAtr,
     defenseAtr,
     magicAtr,
@@ -20,6 +21,7 @@ class Player {
     this.name = name;
     this.startingWeapon = startingWeapon;
     this.startingShield = startingShield;
+    this.inventory = inventory;
     this.attackAtr = attackAtr;
     this.defenseAtr = defenseAtr;
     this.magicAtr = magicAtr;
@@ -31,7 +33,7 @@ class Player {
   }
 
   attack() {
-    const randomNum = Math.floor(Math.random() * 10 + 1);
+    const randomNum = generateRandomNum();
     return this.attackAtr * randomNum + this.attMod;
   }
 
@@ -39,7 +41,7 @@ class Player {
     if (this.health === 100) {
       alert(`You're already at full health!`);
     } else {
-      const randomNum = Math.floor(Math.random() * 10 + 1);
+      const randomNum = generateRandomNum();
       const healingPoints = this.defMod * randomNum;
       if (this.health + healingPoints > 100) {
         this.health = 100;
@@ -60,6 +62,7 @@ const hero = new Player(
   'Knight',
   'Basic Sword',
   'Basic Shield',
+  ['Potion', 'Potion', 'Bomb'],
   12,
   2,
   2,
@@ -73,6 +76,7 @@ class Enemy {
   constructor(
     name,
     weapon,
+    inventory,
     attackAtr,
     defenseAtr,
     magicAtr,
@@ -82,6 +86,7 @@ class Enemy {
   ) {
     this.name = name;
     this.weapon = weapon;
+    this.inventory = inventory;
     this.attackAtr = attackAtr;
     this.defenseAtr = defenseAtr;
     this.magicAtr = magicAtr;
@@ -92,12 +97,12 @@ class Enemy {
   }
 
   attack() {
-    const randomNum = Math.floor(Math.random() * 10 + 1);
+    const randomNum = generateRandomNum();
     return this.attackAtr * randomNum + this.attMod;
   }
 
   heal() {
-    const randomNum = Math.floor(Math.random() * 10 + 1);
+    const randomNum = generateRandomNum();
     const healingPoints = this.defMod * randomNum;
     if (this.health + healingPoints > 100) {
       this.health = 100;
@@ -113,7 +118,21 @@ class Enemy {
   }
 }
 
-const goblin = new Enemy('Goblin', 'Basic Club', 4, 3, 0, 3, 5, 2);
+const goblin = new Enemy(
+  'Goblin',
+  'Basic Club',
+  ['Potion', 'Potion', 'Deadly Spell'],
+  4,
+  3,
+  0,
+  3,
+  5,
+  2
+);
+
+const generateRandomNum = () => {
+  return Math.floor(Math.random() * 10 + 1);
+};
 
 const compareRolls = (playerRoll, enemyRoll, player, enemy) => {
   if (playerRoll > enemyRoll) {
@@ -143,10 +162,10 @@ const battle = (player, enemy) => {
   if (userInput === 'fight') {
     let heroRoll = player.attack();
     if (enemy.health < 50) {
-      let randomNum = Math.floor(Math.random() * 10 + 1);
+      let randomNum = generateRandomNum();
       if (randomNum % 2 === 0) {
         enemy.heal();
-        randomNum = Math.floor(Math.random() * 10 + 1);
+        randomNum = generateRandomNum();
         randomNum % 2 === 1 ? (goblinRoll = heroRoll) : (goblinRoll = 0);
         compareRolls(heroRoll, goblinRoll, player, enemy);
       } else {
@@ -161,7 +180,7 @@ const battle = (player, enemy) => {
     }
   } else if (userInput === 'heal') {
     if (enemy.health < 20) {
-      randomNum = Math.floor(Math.random() * 10 + 1);
+      randomNum = generateRandomNum();
       if (randomNum > 3) {
         player.heal();
         enemy.heal();
