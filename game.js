@@ -225,14 +225,10 @@ class Enemy {
     const healingPoints = item.value;
     if (this.health + healingPoints > 100) {
       this.health = 100;
-      alert(
-        `The ${this.name} casts a healing spell, his health is now at ${this.health}.`
-      );
+      gameText.innerText = `The ${this.name} casts a healing spell, his health is now at ${this.health}.`;
     } else {
       this.health += healingPoints;
-      alert(
-        `The ${this.name} casts a healing spell, his health is now at ${this.health}.`
-      );
+      gameText.innerText = `The ${this.name} casts a healing spell, his health is now at ${this.health}.`;
     }
   }
 }
@@ -379,10 +375,20 @@ const enemyTurn = () => {
   }
 };
 
+//DOM VARIABLES
+let weaponDisplay = document.getElementById('weapon');
+let healthDisplay = document.getElementById('health');
+let gameText = document.getElementById('game-text');
+let inputBtn = document.getElementById('input-btn');
+let userInput = '';
+
+inputBtn.addEventListener('click', () => {
+  userInput = document.getElementById('player-input').value;
+  console.log(userInput);
+  document.getElementById('player-input').value = '';
+});
+
 const mainGame = () => {
-  let weaponDisplay = document.getElementById('weapon');
-  let healthDisplay = document.getElementById('health');
-  let gameText = document.getElementById('game-text');
   gameText.innerText = `The game has started!`;
   while (game.play) {
     game.currentTurn = 'player';
