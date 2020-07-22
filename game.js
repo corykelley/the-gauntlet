@@ -1,33 +1,28 @@
-//---GLOBAL GAME VARIABLES---
-const game = {
-  play: true,
-  currentTurn: 'player',
-};
-
+//PLAYER WEAPONS OBJECT
 const playerWeapons = {
   basicSword: {
     name: 'Basic Sword',
     damage: 15,
+    type: 'Weapon',
   },
   steelSword: {
     name: 'Steel Sword',
     damage: 25,
+    type: 'Weapon',
   },
   knightSword: {
     name: `Knight's Sword`,
     damage: 35,
+    type: 'Weapon',
   },
   masterSword: {
     name: `Master Sword`,
     damage: 45,
+    type: 'Weapon',
   },
 };
 
-const currentBattle = 1;
-
-let currentEnemy = goblin;
-
-//---PLAYER/ENEMY CLASSES AND INSTANCES---
+//PLAYER/ENEMY CLASSES AND INSTANCES
 //Attack Atr: Int between 1 and 10
 //Defense Atr: Int between 1 and 10
 //Attack Modifier: Int between 1 and 5
@@ -60,16 +55,24 @@ class Player {
     this.defMod = defMod;
   }
 
-  attack(enemy) {
+  attack(enemy, weapon) {
     const enemyDefense = enemy.defMod + enemy.defenseAtr;
-    const roll = dieRolls.roll20();
-    console.log(`You rolled a ${roll}`);
-    if (roll + this.attMod > enemyDefense) {
-      const enemyHealthLost = roll + this.attackAtr;
+    const roll20 = dieRolls.roll20();
+    console.log(`You rolled a ${roll20}`);
+    if (roll20 + this.attMod > enemyDefense) {
+      const roll10 = dieRolls.roll10();
+      const enemyHealthLost = roll10 + weapon.damage;
+      console.log(`Roll10: ${roll10}, Weapon Damage: ${weapon.damage}`);
       enemy.health -= enemyHealthLost;
-      alert(`You struck the ${enemy.name}, he lost ${enemyHealthLost} health!`);
-      console.log(`Hero Health: ${this.health}`);
-      console.log(`${enemy.name} Health: ${enemy.health}`);
+      if (weapon.type !== 'Weapon') {
+        alert(`You used a ${weapon.name}, it dealt ${enemyHealthLost} damage!`);
+      } else {
+        alert(
+          `You struck the ${enemy.name}, he lost ${enemyHealthLost} health!`
+        );
+        console.log(`Hero Health: ${this.health}`);
+        console.log(`${enemy.name} Health: ${enemy.health}`);
+      }
     } else {
       alert(`You missed!`);
     }
@@ -171,17 +174,20 @@ class Enemy {
     this.defMod = defMod;
   }
 
-  attack() {
+  attack(weapon) {
     const playerDefense = hero.defMod + hero.defenseAtr;
-    const roll = dieRolls.roll20();
-    if (roll + this.attMod > playerDefense) {
-      const playerHealthLost = roll + this.attackAtr;
+    const roll20 = dieRolls.roll20();
+    if (roll20 + this.attMod > playerDefense) {
+      const roll10 = dieRolls.roll10();
+      const playerHealthLost = roll10 + this.attackAtr;
       hero.health -= playerHealthLost;
       alert(
         `The ${this.name} struck you, you lost ${playerHealthLost} health!`
       );
       console.log(`Hero Health: ${hero.health}`);
       console.log(`${this.name} Health: ${this.health}`);
+    } else {
+      alert(`${this.name} missed!`);
     }
   }
 
@@ -250,26 +256,6 @@ const goblin = new Enemy(
   2
 );
 
-// const compareRolls = (playerRoll, enemyRoll, player, enemy) => {
-//   if (playerRoll > enemyRoll) {
-//     const goblinHealthLost =
-//       Math.round(playerRoll / enemy.defenseAtr) + enemy.defMod;
-//     enemy.health -= goblinHealthLost;
-//     alert(`You struck the goblin, he lost ${goblinHealthLost} health!`);
-//     console.log('Hero Health', player.health);
-//     console.log('Goblin Health', enemy.health);
-//   } else if (playerRoll < enemyRoll) {
-//     const heroHealthLost =
-//       Math.round(enemyRoll / player.defenseAtr) + player.defMod;
-//     player.health -= heroHealthLost;
-//     alert(`The goblin struck you, you lost ${heroHealthLost} health!`);
-//     console.log('Hero Health', player.health);
-//     console.log('Goblin Health', enemy.health);
-//   } else {
-//     alert(`Your weapons meet and you both fly backwards!`);
-//   }
-// };
-
 const battle = (player, enemy) => {
   let userInput = prompt(
     `You've encountered a ${enemy.name}, what will you do? OPTIONS: Fight or Heal?`
@@ -327,10 +313,22 @@ const battle = (player, enemy) => {
   }
 };
 
-//---MAIN GAME FUNCTIONS---
+//GAME OBJECT
+const game = {
+  play: true,
+  currentTurn: 'player',
+  currentEnemy: goblin,
+  currentBattle: 1,
+};
+
+//MAIN GAME FUNCTIONS
 const dieRolls = {
   roll20() {
     return Math.floor(Math.random() * 20 + 1);
+  },
+
+  roll10() {
+    return Math.floor(Math.random() * 10 + 1);
   },
 };
 
@@ -342,11 +340,11 @@ const changeTurn = () => {
 
 const playerTurn = () => {
   let userInput = prompt(
-    `You've encountered a ${currentEnemy.name}, what will you do? OPTIONS: Attack or Use Item?`
+    `You've encountered a ${game.currentEnemy.name}, what will you do? OPTIONS: Attack or Use Item?`
   );
   userInput = userInput.toLowerCase();
   if (userInput === 'attack') {
-    hero.attack(currentEnemy);
+    hero.attack(game.currentEnemy, hero.weapon);
     changeTurn();
   } else if (userInput === 'use item') {
     userInput = prompt(`What item would you like to use?`);
@@ -357,9 +355,9 @@ const playerTurn = () => {
 };
 
 const enemyTurn = () => {
-  // if (currentEnemy.health > 30) {
-  alert(`The ${currentEnemy.name} is planning his next move!`);
-  currentEnemy.attack();
+  // if (game.currentEnemy.health > 30) {
+  alert(`The ${game.currentEnemy.name} is planning his next move!`);
+  game.currentEnemy.attack();
   changeTurn();
   // } else {
 
@@ -369,17 +367,18 @@ const enemyTurn = () => {
 const mainGame = () => {
   alert(`THE GAME HAS STARTED!`);
   while (game.play) {
-    if (currentBattle === 1) {
-      while (currentBattle === 1) {
+    if (game.currentBattle === 1) {
+      while (game.currentBattle === 1) {
         alert(
-          `${hero.name} has ${hero.health} points of health. ${currentEnemy.name} has ${currentEnemy.health} points of health.`
+          `${hero.name} has ${hero.health} points of health. ${game.currentEnemy.name} has ${game.currentEnemy.health} points of health.`
         );
-        if (currentEnemy.health <= 0 || hero.health <= 0) {
-          hero.health > currentEnemy.health
+        //vvv change this statement to either advance and change enemy or to end game vvvvv
+        if (game.currentEnemy.health <= 0 || hero.health <= 0) {
+          hero.health > game.currentEnemy.health
             ? alert(`The day is yours!`)
             : alert(`You've been defeated...`);
-          game.battleOne = false;
           game.play = false;
+          game.currentBattle = 0;
         } else {
           if (game.currentTurn === 'player') {
             playerTurn();
@@ -393,9 +392,3 @@ const mainGame = () => {
 };
 
 mainGame();
-
-//Create main battle sequence logic.
-// -- Create functions for parts of main battle.
-// -- Create player options: ATTACK/MAGIC, HEAL.
-// -- Create a way for the enemy to have some sort of AI (dice roll for if the enemy will heal vs attack).
-// -- Determine win conditions and what to display when player/enemy wins.
