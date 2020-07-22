@@ -382,10 +382,12 @@ let gameText = document.getElementById('game-text');
 let inputBtn = document.getElementById('input-btn');
 let userInput = '';
 
-inputBtn.addEventListener('click', () => {
+inputBtn.addEventListener('click', e => {
+  e.preventDefault();
   userInput = document.getElementById('player-input').value;
   console.log(userInput);
   document.getElementById('player-input').value = '';
+  document.getElementById('player-input').focus();
 });
 
 const mainGame = () => {
