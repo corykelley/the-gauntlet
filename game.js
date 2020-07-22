@@ -1,11 +1,33 @@
-//Create game variables including classes for players and enemies.
+//---GLOBAL GAME VARIABLES---
 const game = {
   play: true,
-  attack: true,
-  battleOne: true,
   currentTurn: 'player',
 };
 
+const playerWeapons = {
+  basicSword: {
+    name: 'Basic Sword',
+    damage: 15,
+  },
+  steelSword: {
+    name: 'Steel Sword',
+    damage: 25,
+  },
+  knightSword: {
+    name: `Knight's Sword`,
+    damage: 35,
+  },
+  masterSword: {
+    name: `Master Sword`,
+    damage: 45,
+  },
+};
+
+const currentBattle = 1;
+
+let currentEnemy = goblin;
+
+//---PLAYER/ENEMY CLASSES AND INSTANCES---
 //Attack Atr: Int between 1 and 10
 //Defense Atr: Int between 1 and 10
 //Attack Modifier: Int between 1 and 5
@@ -13,8 +35,8 @@ const game = {
 class Player {
   constructor(
     name,
-    startingWeapon,
-    startingShield,
+    weapon,
+    shield,
     inventory,
     attackAtr,
     defenseAtr,
@@ -25,8 +47,8 @@ class Player {
     defMod
   ) {
     this.name = name;
-    this.startingWeapon = startingWeapon;
-    this.startingShield = startingShield;
+    this.weapon = weapon;
+    this.shield = shield;
     this.inventory = inventory;
     this.attackAtr = attackAtr;
     this.defenseAtr = defenseAtr;
@@ -98,7 +120,7 @@ class Player {
 
 const hero = new Player(
   'Knight',
-  'Basic Sword',
+  playerWeapons.basicSword,
   'Basic Shield',
   [
     {
@@ -106,12 +128,14 @@ const hero = new Player(
       count: 2,
       value: 25,
       type: 'Light',
+      display: true,
     },
     {
       name: 'Small Bomb',
       count: 2,
       value: 25,
       type: 'Dark',
+      display: true,
     },
   ],
   9,
@@ -208,12 +232,14 @@ const goblin = new Enemy(
       count: 2,
       value: 25,
       type: 'Light',
+      display: true,
     },
     {
       name: 'Deadly Spell',
       count: 1,
       value: 25,
       type: 'Dark',
+      display: true,
     },
   ],
   4,
@@ -223,18 +249,6 @@ const goblin = new Enemy(
   2,
   2
 );
-
-const dieRolls = {
-  roll20() {
-    return Math.floor(Math.random() * 20 + 1);
-  },
-};
-
-const changeTurn = () => {
-  game.currentTurn === 'player'
-    ? (game.currentTurn = 'enemy')
-    : (game.currentTurn = 'player');
-};
 
 // const compareRolls = (playerRoll, enemyRoll, player, enemy) => {
 //   if (playerRoll > enemyRoll) {
@@ -313,6 +327,19 @@ const battle = (player, enemy) => {
   }
 };
 
+//---MAIN GAME FUNCTIONS---
+const dieRolls = {
+  roll20() {
+    return Math.floor(Math.random() * 20 + 1);
+  },
+};
+
+const changeTurn = () => {
+  game.currentTurn === 'player'
+    ? (game.currentTurn = 'enemy')
+    : (game.currentTurn = 'player');
+};
+
 const playerTurn = () => {
   let userInput = prompt(
     `You've encountered a ${currentEnemy.name}, what will you do? OPTIONS: Attack or Use Item?`
@@ -322,16 +349,7 @@ const playerTurn = () => {
     hero.attack(currentEnemy);
     changeTurn();
   } else if (userInput === 'use item') {
-    let playerInventory = hero.inventory.map(el => {
-      return el.count !== 0 ? el.name : null;
-    });
-    playerInventory.length > 1
-      ? (playerInventory = playerInventory.join(', '))
-      : (playerInventory = playerInventory);
-    console.log(playerInventory);
-    userInput = prompt(
-      `What item would you like to use? OPTIONS: ${playerInventory}`
-    );
+    userInput = prompt(`What item would you like to use?`);
     userInput = userInput.toLowerCase();
     hero.useItem(`${userInput}`);
     changeTurn();
@@ -348,26 +366,26 @@ const enemyTurn = () => {
   // }
 };
 
-let currentEnemy = goblin;
-
 const mainGame = () => {
   alert(`THE GAME HAS STARTED!`);
   while (game.play) {
-    while (game.battleOne) {
-      alert(
-        `${hero.name} has ${hero.health} points of health. ${currentEnemy.name} has ${currentEnemy.health} points of health.`
-      );
-      if (currentEnemy.health <= 0 || hero.health <= 0) {
-        hero.health > currentEnemy.health
-          ? alert(`The day is yours!`)
-          : alert(`You've been defeated...`);
-        game.battleOne = false;
-        game.play = false;
-      } else {
-        if (game.currentTurn === 'player') {
-          playerTurn();
+    if (currentBattle === 1) {
+      while (currentBattle === 1) {
+        alert(
+          `${hero.name} has ${hero.health} points of health. ${currentEnemy.name} has ${currentEnemy.health} points of health.`
+        );
+        if (currentEnemy.health <= 0 || hero.health <= 0) {
+          hero.health > currentEnemy.health
+            ? alert(`The day is yours!`)
+            : alert(`You've been defeated...`);
+          game.battleOne = false;
+          game.play = false;
         } else {
-          enemyTurn();
+          if (game.currentTurn === 'player') {
+            playerTurn();
+          } else {
+            enemyTurn();
+          }
         }
       }
     }
