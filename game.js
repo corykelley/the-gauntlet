@@ -32,44 +32,39 @@ const enemyWeapons = {
 
 //PLAYER/ENEMY CLASSES AND INSTANCES
 //Attack Atr: Int between 1 and 10
-//Defense Atr: Int between 1 and 10
+//Defense Atr: Int between 1 and 20
+//Luck Atr: Int between 1 and 20
 //Attack Modifier: Int between 1 and 5
-//Defense Modifier: Int between 1 and 5
 class Player {
   constructor(
     name,
     weapon,
-    shield,
     inventory,
     attackAtr,
     defenseAtr,
     magicAtr,
-    speedAtr,
+    luckAtr,
     magicLevel,
-    attMod,
-    defMod
+    attMod
   ) {
     this.name = name;
     this.weapon = weapon;
-    this.shield = shield;
     this.inventory = inventory;
     this.attackAtr = attackAtr;
     this.defenseAtr = defenseAtr;
     this.magicAtr = magicAtr;
-    this.speedAtr = speedAtr;
+    this.luckAtr = luckAtr;
     this.health = 100;
     this.magicLevel = magicLevel;
     this.attMod = attMod;
-    this.defMod = defMod;
   }
 
   attack(enemy, weapon) {
-    const enemyDefense = enemy.defMod + enemy.defenseAtr;
     const roll20 = dieRolls.roll20();
     console.log(`You rolled a ${roll20}`);
-    if (roll20 + this.attMod > enemyDefense) {
+    if (roll20 + this.attMod > enemy.luckAtr) {
       const roll10 = dieRolls.roll10();
-      const enemyHealthLost = roll10 + weapon.damage;
+      const enemyHealthLost = roll10 + weapon.damage - enemy.defenseAtr;
       console.log(`Roll10: ${roll10}, Weapon Damage: ${weapon.damage}`);
       enemy.health -= enemyHealthLost;
       if (weapon.type !== 'Weapon') {
@@ -133,7 +128,6 @@ class Player {
 const hero = new Player(
   'Knight',
   playerWeapons.basicSword,
-  'Basic Shield',
   [
     {
       name: 'Potion',
@@ -153,7 +147,7 @@ const hero = new Player(
   9,
   2,
   2,
-  3,
+  5,
   50,
   4,
   2
@@ -167,9 +161,8 @@ class Enemy {
     attackAtr,
     defenseAtr,
     magicAtr,
-    speedAtr,
-    attMod,
-    defMod
+    luckAtr,
+    attMod
   ) {
     this.name = name;
     this.weapon = weapon;
@@ -177,18 +170,17 @@ class Enemy {
     this.attackAtr = attackAtr;
     this.defenseAtr = defenseAtr;
     this.magicAtr = magicAtr;
-    this.speedAtr = speedAtr;
+    this.luckAtr = luckAtr;
     this.health = 100;
     this.attMod = attMod;
-    this.defMod = defMod;
   }
 
   attack(weapon) {
-    const playerDefense = hero.defMod + hero.defenseAtr;
     const roll20 = dieRolls.roll20();
-    if (roll20 + this.attMod > playerDefense) {
+    console.log(`Enemy rolled a ${roll20}`);
+    if (roll20 + this.attMod > hero.luckAtr) {
       const roll10 = dieRolls.roll10();
-      const playerHealthLost = roll10 + weapon.damage;
+      const playerHealthLost = roll10 + weapon.damage - hero.defenseAtr;
       hero.health -= playerHealthLost;
       if (weapon.type !== 'Weapon') {
         alert(
@@ -267,67 +259,9 @@ const goblin = new Enemy(
   4,
   3,
   0,
-  3,
-  2,
+  8,
   2
 );
-
-const battle = (player, enemy) => {
-  let userInput = prompt(
-    `You've encountered a ${enemy.name}, what will you do? OPTIONS: Fight or Heal?`
-  );
-  userInput = userInput.toLowerCase();
-  if (userInput === 'fight') {
-    let heroRoll = player.attack();
-    if (enemy.health < 50) {
-      let randomNum = generateRandomNum();
-      if (randomNum % 2 === 0) {
-        enemy.useItem('Potion');
-        console.log('Enemy is using a potion');
-        randomNum = generateRandomNum();
-        randomNum % 2 === 1 ? (goblinRoll = heroRoll) : (goblinRoll = 0);
-        compareRolls(heroRoll, goblinRoll, player, enemy);
-      } else {
-        let goblinRoll = enemy.attack();
-        compareRolls(heroRoll, goblinRoll, player, enemy);
-      }
-    } else {
-      let goblinRoll = enemy.attack();
-      console.log('Hero roll', heroRoll);
-      console.log('Goblin Roll', goblinRoll);
-      compareRolls(heroRoll, goblinRoll, player, enemy);
-    }
-  } else if (userInput === 'heal') {
-    if (enemy.health < 20) {
-      randomNum = generateRandomNum();
-      if (randomNum > 3) {
-        player.useItem('Potion');
-        enemy.useItem('Potion');
-        return;
-      } else {
-        player.useItem('Potion');
-        const heroRoll = player.defenseAtr + player.defMod;
-        const goblinRoll = enemy.attack();
-        console.log('Hero roll', heroRoll);
-        console.log('Goblin Roll', goblinRoll);
-      }
-    } else {
-      player.useItem('Potion');
-      const heroRoll = player.defenseAtr + player.defMod;
-      const goblinRoll = enemy.attack();
-      console.log('Hero roll', heroRoll);
-      console.log('Goblin Roll', goblinRoll);
-      if (heroRoll < goblinRoll) {
-        const heroHealthLost =
-          Math.round(goblinRoll / player.defenseAtr) + player.defMod;
-        player.health -= heroHealthLost;
-        alert(`The goblin struck you, you lost ${heroHealthLost} health!`);
-        console.log('Hero Health', player.health);
-        console.log('Goblin Health', enemy.health);
-      }
-    }
-  }
-};
 
 //GAME OBJECT
 const game = {
@@ -416,7 +350,7 @@ const mainGame = () => {
   while (game.play) {
     if (game.currentBattle === 1) {
       while (game.currentBattle === 1) {
-        alert(
+        console.log(
           `${hero.name} has ${hero.health} points of health. ${game.currentEnemy.name} has ${game.currentEnemy.health} points of health.`
         );
         //vvv change this statement to either advance and change enemy or to end game vvvvv
