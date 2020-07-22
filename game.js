@@ -208,6 +208,7 @@ class Enemy {
 
   useItem(item) {
     let itemToUse = '';
+    item = toTitleCase(item);
     for (let i = 0; i < this.inventory.length; i++) {
       if (this.inventory[i].name === item) {
         itemToUse = this.inventory[i];
@@ -221,7 +222,7 @@ class Enemy {
           if (itemToUse.type === 'Light') {
             this.heal(itemToUse);
           } else if (itemToUse.type === 'Dark') {
-            alert(`You use ${itemToUse.name} it was effective!`);
+            this.attack(itemToUse);
           }
         }
       }
@@ -258,7 +259,7 @@ const goblin = new Enemy(
     {
       name: 'Deadly Spell',
       count: 1,
-      value: 25,
+      damage: 25,
       type: 'Dark',
       display: true,
     },
@@ -354,6 +355,10 @@ const dieRolls = {
   roll10() {
     return Math.floor(Math.random() * 10 + 1);
   },
+
+  roll5() {
+    return Math.floor(Math.random() * 5 + 1);
+  },
 };
 
 const changeTurn = () => {
@@ -379,13 +384,31 @@ const playerTurn = () => {
 };
 
 const enemyTurn = () => {
-  // if (game.currentEnemy.health > 30) {
   alert(`The ${game.currentEnemy.name} is planning his next move!`);
-  game.currentEnemy.attack(game.currentEnemy.weapon);
-  changeTurn();
-  // } else {
-
-  // }
+  if (game.currentEnemy.health > 35) {
+    const roll5 = dieRolls.roll5();
+    if (roll5 === 1) {
+      game.currentEnemy.useItem(game.currentEnemy.inventory[1].name);
+      changeTurn();
+    } else {
+      game.currentEnemy.attack(game.currentEnemy.weapon);
+      changeTurn();
+    }
+  } else {
+    const roll10 = dieRolls.roll10();
+    if (roll10 % 2 === 1 && game.currentEnemy.inventory[0].count > 0) {
+      game.currentEnemy.useItem(game.currentEnemy.inventory[0].name);
+      changeTurn();
+    } else {
+      if (roll10 <= 5 && game.currentEnemy.inventory[1].count > 0) {
+        game.currentEnemy.useItem(game.currentEnemy.inventory[1].name);
+        changeTurn();
+      } else {
+        game.currentEnemy.attack(game.currentEnemy.weapon);
+        changeTurn();
+      }
+    }
+  }
 };
 
 const mainGame = () => {
