@@ -380,17 +380,18 @@ const enemyTurn = () => {
 };
 
 const mainGame = () => {
-  alert(`THE GAME HAS STARTED!`);
+  let weaponDisplay = document.getElementById('weapon');
+  let healthDisplay = document.getElementById('health');
+  let gameText = document.getElementById('game-text');
+  gameText.innerText = `The game has started!`;
   while (game.play) {
     game.currentTurn = 'player';
-    alert(
-      `You've spotted a ${game.currentEnemy.name} coming right for you! Time to fight!`
-    );
+    gameText = `You've spotted a ${game.currentEnemy.name} coming right for you! Time to fight!`;
     game.battle = true;
     while (game.battle) {
-      console.log(
-        `${hero.name} has ${hero.health} points of health. ${game.currentEnemy.name} has ${game.currentEnemy.health} points of health.`
-      );
+      weaponDisplay.innerText = hero.weapon.name;
+      healthDisplay.innerText = hero.health;
+      gameText.innerText = `${hero.name} has ${hero.health} points of health. ${game.currentEnemy.name} has ${game.currentEnemy.health} points of health.`;
       if (game.currentEnemy.health <= 0) {
         alert(`The enemy has been defeated, the day is yours!`);
         enemyIndex++;

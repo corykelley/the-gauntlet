@@ -1,0 +1,53 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  border: solid 1px seagreen;
+}
+
+.main-container {
+  margin: 2rem auto 3rem;
+  width: 90vw;
+  max-width: 1250px;
+  background-color: salmon;
+}
+
+.display {
+  display: flex;
+  flex-direction: column;
+  background-color: sandybrown;
+  margin: 1rem auto;
+}
+
+.action-stats {
+  display: grid;
+  grid-template-columns: 4fr 2fr;
+}
+
+.action-stats div {
+  margin: 0.5rem;
+}
+
+.action {
+  background-color: slateblue;
+  height: 500px;
+}
+
+.stats {
+  background-color: slategrey;
+  height: 500px;
+}
+
+.game-info {
+  height: 200px;
+  background-color: thistle;
+  margin: 0 0.5rem 0.5rem;
+  display: flex;
+  flex-direction: row;
+  padding: 0.5rem;
+}
+
+.game-info .text {
+  flex-grow: 1;
+  margin-right: 0.5rem;
+}
