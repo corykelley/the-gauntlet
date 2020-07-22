@@ -140,7 +140,7 @@ const hero = new Player(
       name: 'Small Bomb',
       count: 2,
       type: 'Dark',
-      damage: 30,
+      damage: 80,
       display: true,
     },
   ],
@@ -263,12 +263,46 @@ const goblin = new Enemy(
   2
 );
 
+const troll = new Enemy(
+  'Troll',
+  enemyWeapons.basicClub,
+  [
+    {
+      name: 'Potion',
+      count: 2,
+      value: 25,
+      type: 'Light',
+      display: true,
+    },
+    {
+      name: 'Deadly Spell',
+      count: 1,
+      damage: 25,
+      type: 'Dark',
+      display: true,
+    },
+  ],
+  4,
+  3,
+  0,
+  8,
+  2
+);
+
+//VARIABLES THAT DECIDE CURRENT ENEMY
+const enemyArr = [goblin, troll];
+let enemyIndex = 0;
+
 //GAME OBJECT
 const game = {
   play: true,
+  battle: true,
   currentTurn: 'player',
-  currentEnemy: goblin,
+  currentEnemy: enemyArr[enemyIndex],
   currentBattle: 1,
+  changeEnemy() {
+    this.currentEnemy = enemyArr[enemyIndex];
+  },
 };
 
 //HELPER FUNCTIONS
@@ -348,24 +382,29 @@ const enemyTurn = () => {
 const mainGame = () => {
   alert(`THE GAME HAS STARTED!`);
   while (game.play) {
-    if (game.currentBattle === 1) {
-      while (game.currentBattle === 1) {
-        console.log(
-          `${hero.name} has ${hero.health} points of health. ${game.currentEnemy.name} has ${game.currentEnemy.health} points of health.`
-        );
-        //vvv change this statement to either advance and change enemy or to end game vvvvv
-        if (game.currentEnemy.health <= 0 || hero.health <= 0) {
-          hero.health > game.currentEnemy.health
-            ? alert(`The day is yours!`)
-            : alert(`You've been defeated...`);
-          game.play = false;
-          game.currentBattle = 0;
+    game.currentTurn = 'player';
+    alert(
+      `You've spotted a ${game.currentEnemy.name} coming right for you! Time to fight!`
+    );
+    game.battle = true;
+    while (game.battle) {
+      console.log(
+        `${hero.name} has ${hero.health} points of health. ${game.currentEnemy.name} has ${game.currentEnemy.health} points of health.`
+      );
+      if (game.currentEnemy.health <= 0) {
+        alert(`The enemy has been defeated, the day is yours!`);
+        enemyIndex++;
+        game.changeEnemy();
+        game.battle = false;
+      } else if (hero.health <= 0) {
+        alert(`You've been defeated, all hope is lost!`);
+        game.battle = false;
+        game.play = false;
+      } else {
+        if (game.currentTurn === 'player') {
+          playerTurn();
         } else {
-          if (game.currentTurn === 'player') {
-            playerTurn();
-          } else {
-            enemyTurn();
-          }
+          enemyTurn();
         }
       }
     }
