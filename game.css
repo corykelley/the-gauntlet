@@ -7,8 +7,10 @@
   border: solid 1px seagreen;
 }
 
-bo {
+body {
   font-family: 'VT323', monospace;
+  font-size: 20px;
+  letter-spacing: 1.5px;
 }
 
 .main-container {
