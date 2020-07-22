@@ -1,4 +1,4 @@
-//PLAYER WEAPONS OBJECT
+//PLAYER/ENEMY WEAPONS OBJECT
 const playerWeapons = {
   basicSword: {
     name: 'Basic Sword',
@@ -18,6 +18,14 @@ const playerWeapons = {
   masterSword: {
     name: `Master Sword`,
     damage: 45,
+    type: 'Weapon',
+  },
+};
+
+const enemyWeapons = {
+  basicClub: {
+    name: 'Basic Club',
+    damage: 10,
     type: 'Weapon',
   },
 };
@@ -66,6 +74,7 @@ class Player {
       enemy.health -= enemyHealthLost;
       if (weapon.type !== 'Weapon') {
         alert(`You used a ${weapon.name}, it dealt ${enemyHealthLost} damage!`);
+        weapon.count--;
       } else {
         alert(
           `You struck the ${enemy.name}, he lost ${enemyHealthLost} health!`
@@ -80,20 +89,20 @@ class Player {
 
   useItem(item) {
     let itemToUse = '';
-    item = item[0].toUpperCase() + item.split('').splice(1).join('');
+    item = toTitleCase(item);
     for (let i = 0; i < this.inventory.length; i++) {
       if (this.inventory[i].name === item) {
         itemToUse = this.inventory[i];
         console.log(itemToUse.count);
         if (itemToUse.count === 0) {
-          alert('You dont have enough to use that');
+          alert('You have none of that item left!');
           return;
         } else {
           console.log(`Count gone down`, this.inventory);
           if (itemToUse.type === 'Light') {
             this.heal(itemToUse);
           } else if (itemToUse.type === 'Dark') {
-            alert(`You use ${itemToUse.name} it was effective!`);
+            this.attack(game.currentEnemy, itemToUse);
           }
         }
       }
@@ -136,8 +145,8 @@ const hero = new Player(
     {
       name: 'Small Bomb',
       count: 2,
-      value: 25,
       type: 'Dark',
+      damage: 30,
       display: true,
     },
   ],
@@ -179,13 +188,19 @@ class Enemy {
     const roll20 = dieRolls.roll20();
     if (roll20 + this.attMod > playerDefense) {
       const roll10 = dieRolls.roll10();
-      const playerHealthLost = roll10 + this.attackAtr;
+      const playerHealthLost = roll10 + weapon.damage;
       hero.health -= playerHealthLost;
-      alert(
-        `The ${this.name} struck you, you lost ${playerHealthLost} health!`
-      );
-      console.log(`Hero Health: ${hero.health}`);
-      console.log(`${this.name} Health: ${this.health}`);
+      if (weapon.type !== 'Weapon') {
+        alert(
+          `The ${this.name} used a ${weapon.name}, it dealt ${playerHealthLost} damage!`
+        );
+      } else {
+        alert(
+          `The ${this.name} struck you, you lost ${playerHealthLost} health!`
+        );
+        console.log(`Hero Health: ${hero.health}`);
+        console.log(`${this.name} Health: ${this.health}`);
+      }
     } else {
       alert(`${this.name} missed!`);
     }
@@ -231,7 +246,7 @@ class Enemy {
 
 const goblin = new Enemy(
   'Goblin',
-  'Basic Club',
+  enemyWeapons.basicClub,
   [
     {
       name: 'Potion',
@@ -321,6 +336,15 @@ const game = {
   currentBattle: 1,
 };
 
+//HELPER FUNCTIONS
+const toTitleCase = function (str) {
+  return str
+    .toLowerCase()
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
+
 //MAIN GAME FUNCTIONS
 const dieRolls = {
   roll20() {
@@ -357,7 +381,7 @@ const playerTurn = () => {
 const enemyTurn = () => {
   // if (game.currentEnemy.health > 30) {
   alert(`The ${game.currentEnemy.name} is planning his next move!`);
-  game.currentEnemy.attack();
+  game.currentEnemy.attack(game.currentEnemy.weapon);
   changeTurn();
   // } else {
 
