@@ -4,9 +4,10 @@ let healthDisplay = document.getElementById('health');
 let enemyWeaponDisplay = document.getElementById('enemy-weapon');
 let enemyHealthDisplay = document.getElementById('enemy-health');
 let enemyNameDisplay = document.getElementById('enemy-name');
+let progressBtn = document.getElementById('progress');
 let playerInput = document.getElementById('player-input');
 let gameText = document.getElementById('game-text');
-let userInput = '';
+let inputValue = '';
 
 //PLAYER/ENEMY WEAPONS OBJECT
 const playerWeapons = {
@@ -81,26 +82,23 @@ class Player {
         updateStats(hero, game.currentEnemy);
         gameText.innerText = `You used a ${weapon.name}, it dealt ${enemyHealthLost} damage!`;
         weapon.count--;
-        document.addEventListener('keydown', () => {
+        progressBtn.addEventListener('click', () => {
           changeTurn();
-          playRound();
         });
       } else {
         updateStats(hero, game.currentEnemy);
         gameText.innerText = `You struck the ${enemy.name}, he lost ${enemyHealthLost} health!`;
         console.log(`Hero Health: ${this.health}`);
         console.log(`${enemy.name} Health: ${enemy.health}`);
-        document.addEventListener('keydown', () => {
+        progressBtn.addEventListener('click', () => {
           changeTurn();
-          enemyTurn();
         });
       }
     } else {
       updateStats(hero, game.currentEnemy);
       gameText.innerText = `You missed!`;
-      document.addEventListener('keydown', () => {
+      progressBtn.addEventListener('click', () => {
         changeTurn();
-        playRound();
       });
     }
   }
@@ -209,26 +207,23 @@ class Enemy {
         updateStats(hero, game.currentEnemy);
         gameText.innerText = `The ${this.name} used a ${weapon.name}, it dealt ${playerHealthLost} damage!`;
         weapon.count--;
-        document.addEventListener('keydown', () => {
+        progressBtn.addEventListener('click', () => {
           changeTurn();
-          playRound();
         });
       } else {
         updateStats(hero, game.currentEnemy);
         gameText.innerText = `The ${this.name} struck you, you lost ${playerHealthLost} health!`;
         console.log(`Hero Health: ${hero.health}`);
         console.log(`${this.name} Health: ${this.health}`);
-        document.addEventListener('keydown', () => {
+        progressBtn.addEventListener('click', () => {
           changeTurn();
-          playRound();
         });
       }
     } else {
       updateStats(hero, game.currentEnemy);
       gameText.innerText = `${this.name} missed!`;
-      document.addEventListener('keydown', () => {
+      progressBtn.addEventListener('click', () => {
         changeTurn();
-        playRound();
       });
     }
   }
@@ -372,65 +367,63 @@ const updateStats = (player, enemy) => {
 };
 
 const changeTurn = () => {
-  game.currentTurn === 'player'
-    ? (game.currentTurn = 'enemy')
-    : (game.currentTurn = 'player');
+  gameText.innerText = 'You regroup and get ready for more fight!';
+  progressBtn.addEventListener('click', () => {
+    if (game.currentTurn === 'player') {
+      game.currentTurn = 'enemy';
+      playRound();
+    } else {
+      game.currentTurn = 'player';
+      playRound();
+    }
+  });
 };
 
 //TURNS
-const playerTurn = value => {
-  if (value === 'attack') {
-    hero.attack(game.currentEnemy, hero.weapon);
-  }
+const playerTurn = () => {
+  playerInput.value = '';
+  playerInput.focus();
+  gameText.innerText = dialog.spotEnemy;
+  progressBtn.addEventListener('click', () => {
+    inputValue = playerInput.value.toLowerCase();
+    console.log(inputValue);
+    if (inputValue === 'attack') {
+      hero.attack(game.currentEnemy, hero.weapon);
+      playerInput.value = '';
+    }
+  });
 };
 
 const enemyTurn = () => {
   gameText.innerText = `The ${game.currentEnemy.name} is planning his next move!`;
-  // if (game.currentEnemy.health > 35) {
-  //   const roll5 = dieRolls.roll5();
-  //   if (roll5 === 1) {
-  //     game.currentEnemy.useItem(game.currentEnemy.inventory[1].name);
-  //   } else {
-  //     game.currentEnemy.attack(game.currentEnemy.weapon);
-  //   }
-  // } else {
-  //   const roll10 = dieRolls.roll10();
-  //   if (roll10 % 2 === 1 && game.currentEnemy.inventory[0].count > 0) {
-  //     game.currentEnemy.useItem(game.currentEnemy.inventory[0].name);
-  //   } else {
-  //     if (roll10 <= 5 && game.currentEnemy.inventory[1].count > 0) {
-  //       game.currentEnemy.useItem(game.currentEnemy.inventory[1].name);
-  //     } else {
-  //       game.currentEnemy.attack(game.currentEnemy.weapon);
-  //     }
-  //   }
-  // }
-  game.currentEnemy.attack(game.currentEnemy.weapon);
+  progressBtn.addEventListener('click', () => {
+    if (game.currentEnemy.health > 35) {
+      const roll5 = dieRolls.roll5();
+      if (roll5 === 1) {
+        game.currentEnemy.useItem(game.currentEnemy.inventory[1].name);
+      } else {
+        game.currentEnemy.attack(game.currentEnemy.weapon);
+      }
+    } else {
+      const roll10 = dieRolls.roll10();
+      if (roll10 % 2 === 1 && game.currentEnemy.inventory[0].count > 0) {
+        game.currentEnemy.useItem(game.currentEnemy.inventory[0].name);
+      } else {
+        if (roll10 <= 5 && game.currentEnemy.inventory[1].count > 0) {
+          game.currentEnemy.useItem(game.currentEnemy.inventory[1].name);
+        } else {
+          game.currentEnemy.attack(game.currentEnemy.weapon);
+        }
+      }
+    }
+  });
 };
 
 const playRound = () => {
-  let value = '';
-  console.log(game.currentTurn);
   if (game.currentTurn !== 'player') {
-    value = '';
     enemyTurn();
   } else {
-    playerInput.value = '';
-    playerInput.focus();
-    gameText.innerText = dialog.spotEnemy;
-    document.addEventListener('keydown', e => {
-      if (e.keyCode === 13 && playerInput.value !== '') {
-        e.preventDefault();
-        value = playerInput.value.toLowerCase();
-        console.log(value);
-        playerInput.value = '';
-        playerInput.focus();
-        playerTurn(value);
-      } else if (e.keyCode === 13 && playerInput.value === '' && value === '') {
-        e.preventDefault();
-        alert(`Please provide a response!`);
-      }
-    });
+    playerTurn();
   }
 };
 
