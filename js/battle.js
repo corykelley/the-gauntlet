@@ -1,3 +1,13 @@
+//DOM VARIABLES
+let weaponDisplay = document.getElementById('weapon');
+let healthDisplay = document.getElementById('health');
+let enemyWeaponDisplay = document.getElementById('enemy-weapon');
+let enemyHealthDisplay = document.getElementById('enemy-health');
+let enemyNameDisplay = document.getElementById('enemy-name');
+let playerInput = document.getElementById('player-input');
+let gameText = document.getElementById('game-text');
+let userInput = '';
+
 //PLAYER/ENEMY WEAPONS OBJECT
 const playerWeapons = {
   basicSword: {
@@ -68,18 +78,18 @@ class Player {
       console.log(`Roll10: ${roll10}, Weapon Damage: ${weapon.damage}`);
       enemy.health -= enemyHealthLost;
       if (weapon.type !== 'Weapon') {
-        alert(`You used a ${weapon.name}, it dealt ${enemyHealthLost} damage!`);
+        gameText.innerText = `You used a ${weapon.name}, it dealt ${enemyHealthLost} damage!`;
         weapon.count--;
       } else {
-        alert(
-          `You struck the ${enemy.name}, he lost ${enemyHealthLost} health!`
-        );
+        gameText.innerText = `You struck the ${enemy.name}, he lost ${enemyHealthLost} health!`;
         console.log(`Hero Health: ${this.health}`);
         console.log(`${enemy.name} Health: ${enemy.health}`);
       }
     } else {
-      alert(`You missed!`);
+      gameText.innerText = `You missed!`;
     }
+    updateStats(hero, game.currentEnemy);
+    changeTurn();
   }
 
   useItem(item) {
@@ -292,13 +302,17 @@ let enemyIndex = 0;
 //GAME OBJECT
 const game = {
   play: true,
-  battle: true,
+  battle: false,
   currentTurn: 'player',
   currentEnemy: enemyArr[enemyIndex],
-  currentBattle: 1,
   changeEnemy() {
     this.currentEnemy = enemyArr[enemyIndex];
   },
+};
+
+//DIALOG
+const dialog = {
+  spotEnemy: `You see a ${game.currentEnemy.name} running towards your with a firey rage in his eyes! It looks like you will be thrown into a battle, what will you do? OPTIONS: (a)ttack, (u)se item?`,
 };
 
 //HELPER FUNCTIONS
@@ -310,7 +324,6 @@ const toTitleCase = function (str) {
     .join(' ');
 };
 
-//MAIN GAME FUNCTIONS
 const dieRolls = {
   roll20() {
     return Math.floor(Math.random() * 20 + 1);
@@ -325,97 +338,87 @@ const dieRolls = {
   },
 };
 
+const updateStats = (player, enemy) => {
+  weaponDisplay.innerText = player.weapon.name;
+  healthDisplay.innerText = player.health;
+  enemyWeaponDisplay.innerText = enemy.weapon.name;
+  enemyHealthDisplay.innerText = enemy.health;
+  enemyNameDisplay.innerText = enemy.name;
+};
+
 const changeTurn = () => {
   game.currentTurn === 'player'
     ? (game.currentTurn = 'enemy')
     : (game.currentTurn = 'player');
 };
 
-const playerTurn = () => {
-  let userInput = prompt(
-    `You've encountered a ${game.currentEnemy.name}, what will you do? OPTIONS: Attack or Use Item?`
-  );
-  userInput = userInput.toLowerCase();
-  if (userInput === 'attack') {
-    hero.attack(game.currentEnemy, hero.weapon);
-    changeTurn();
-  } else if (userInput === 'use item') {
-    userInput = prompt(`What item would you like to use?`);
-    userInput = userInput.toLowerCase();
-    hero.useItem(`${userInput}`);
-    changeTurn();
-  }
-};
+// BATTLE FUNCTION
+// const battle = () => {
+//   updateStats();
+//   promptUser();
+// };
 
+// battle();
+
+//TURNS
 const enemyTurn = () => {
-  alert(`The ${game.currentEnemy.name} is planning his next move!`);
-  if (game.currentEnemy.health > 35) {
-    const roll5 = dieRolls.roll5();
-    if (roll5 === 1) {
-      game.currentEnemy.useItem(game.currentEnemy.inventory[1].name);
-      changeTurn();
-    } else {
-      game.currentEnemy.attack(game.currentEnemy.weapon);
-      changeTurn();
-    }
-  } else {
-    const roll10 = dieRolls.roll10();
-    if (roll10 % 2 === 1 && game.currentEnemy.inventory[0].count > 0) {
-      game.currentEnemy.useItem(game.currentEnemy.inventory[0].name);
-      changeTurn();
-    } else {
-      if (roll10 <= 5 && game.currentEnemy.inventory[1].count > 0) {
+  gameText.innerText = `The ${game.currentEnemy.name} is planning his next move!`;
+  document.addEventListener('keypress', e => {
+    if (game.currentEnemy.health > 35) {
+      const roll5 = dieRolls.roll5();
+      if (roll5 === 1) {
         game.currentEnemy.useItem(game.currentEnemy.inventory[1].name);
         changeTurn();
+        mainGame();
       } else {
         game.currentEnemy.attack(game.currentEnemy.weapon);
         changeTurn();
+        mainGame();
       }
-    }
-  }
-};
-
-//DOM VARIABLES
-let weaponDisplay = document.getElementById('weapon');
-let healthDisplay = document.getElementById('health');
-let gameText = document.getElementById('game-text');
-let inputBtn = document.getElementById('input-btn');
-let userInput = '';
-
-inputBtn.addEventListener('click', e => {
-  e.preventDefault();
-  userInput = document.getElementById('player-input').value;
-  console.log(userInput);
-  document.getElementById('player-input').value = '';
-  document.getElementById('player-input').focus();
-});
-
-const mainGame = () => {
-  gameText.innerText = `The game has started!`;
-  while (game.play) {
-    game.currentTurn = 'player';
-    gameText = `You've spotted a ${game.currentEnemy.name} coming right for you! Time to fight!`;
-    game.battle = true;
-    while (game.battle) {
-      weaponDisplay.innerText = hero.weapon.name;
-      healthDisplay.innerText = hero.health;
-      gameText.innerText = `${hero.name} has ${hero.health} points of health. ${game.currentEnemy.name} has ${game.currentEnemy.health} points of health.`;
-      if (game.currentEnemy.health <= 0) {
-        alert(`The enemy has been defeated, the day is yours!`);
-        enemyIndex++;
-        game.changeEnemy();
-        game.battle = false;
-      } else if (hero.health <= 0) {
-        alert(`You've been defeated, all hope is lost!`);
-        game.battle = false;
-        game.play = false;
+    } else {
+      const roll10 = dieRolls.roll10();
+      if (roll10 % 2 === 1 && game.currentEnemy.inventory[0].count > 0) {
+        game.currentEnemy.useItem(game.currentEnemy.inventory[0].name);
+        changeTurn();
       } else {
-        if (game.currentTurn === 'player') {
-          playerTurn();
+        if (roll10 <= 5 && game.currentEnemy.inventory[1].count > 0) {
+          game.currentEnemy.useItem(game.currentEnemy.inventory[1].name);
+          changeTurn();
+          mainGame();
         } else {
-          enemyTurn();
+          game.currentEnemy.attack(game.currentEnemy.weapon);
+          changeTurn();
+          mainGame();
         }
       }
+    }
+  });
+};
+
+const mainGame = enemy => {
+  updateStats(hero, game.currentEnemy);
+  if (game.play) {
+    if (game.currentTurn !== 'player') {
+      enemyTurn();
+    } else {
+      playerInput.focus();
+      gameText.innerText = dialog.spotEnemy;
+      document.addEventListener('keypress', e => {
+        if (e.keyCode === 13 && playerInput.value !== '') {
+          e.preventDefault();
+          let value = playerInput.value.toLowerCase();
+          console.log(value);
+          playerInput.value = '';
+          playerInput.focus();
+          if (value === 'attack') {
+            hero.attack(game.currentEnemy, hero.weapon);
+            mainGame();
+          }
+        } else if (e.keyCode === 13 && playerInput.value !== '') {
+          e.preventDefault();
+          null;
+        }
+      });
     }
   }
 };

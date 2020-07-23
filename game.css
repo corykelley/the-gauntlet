@@ -7,10 +7,15 @@
   border: solid 1px seagreen;
 }
 
-body {
+body,
+button {
   font-family: 'VT323', monospace;
   font-size: 20px;
   letter-spacing: 1.5px;
+}
+
+button:hover {
+  cursor: pointer;
 }
 
 .main-container {
