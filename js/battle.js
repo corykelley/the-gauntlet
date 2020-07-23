@@ -78,18 +78,31 @@ class Player {
       console.log(`Roll10: ${roll10}, Weapon Damage: ${weapon.damage}`);
       enemy.health -= enemyHealthLost;
       if (weapon.type !== 'Weapon') {
+        updateStats(hero, game.currentEnemy);
         gameText.innerText = `You used a ${weapon.name}, it dealt ${enemyHealthLost} damage!`;
         weapon.count--;
+        document.addEventListener('keydown', () => {
+          changeTurn();
+          playRound();
+        });
       } else {
+        updateStats(hero, game.currentEnemy);
         gameText.innerText = `You struck the ${enemy.name}, he lost ${enemyHealthLost} health!`;
         console.log(`Hero Health: ${this.health}`);
         console.log(`${enemy.name} Health: ${enemy.health}`);
+        document.addEventListener('keydown', () => {
+          changeTurn();
+          enemyTurn();
+        });
       }
     } else {
+      updateStats(hero, game.currentEnemy);
       gameText.innerText = `You missed!`;
+      document.addEventListener('keydown', () => {
+        changeTurn();
+        playRound();
+      });
     }
-    updateStats(hero, game.currentEnemy);
-    changeTurn();
   }
 
   useItem(item) {
@@ -193,18 +206,30 @@ class Enemy {
       const playerHealthLost = roll10 + weapon.damage - hero.defenseAtr;
       hero.health -= playerHealthLost;
       if (weapon.type !== 'Weapon') {
-        alert(
-          `The ${this.name} used a ${weapon.name}, it dealt ${playerHealthLost} damage!`
-        );
+        updateStats(hero, game.currentEnemy);
+        gameText.innerText = `The ${this.name} used a ${weapon.name}, it dealt ${playerHealthLost} damage!`;
+        weapon.count--;
+        document.addEventListener('keydown', () => {
+          changeTurn();
+          playRound();
+        });
       } else {
-        alert(
-          `The ${this.name} struck you, you lost ${playerHealthLost} health!`
-        );
+        updateStats(hero, game.currentEnemy);
+        gameText.innerText = `The ${this.name} struck you, you lost ${playerHealthLost} health!`;
         console.log(`Hero Health: ${hero.health}`);
         console.log(`${this.name} Health: ${this.health}`);
+        document.addEventListener('keydown', () => {
+          changeTurn();
+          playRound();
+        });
       }
     } else {
-      alert(`${this.name} missed!`);
+      updateStats(hero, game.currentEnemy);
+      gameText.innerText = `${this.name} missed!`;
+      document.addEventListener('keydown', () => {
+        changeTurn();
+        playRound();
+      });
     }
   }
 
@@ -216,7 +241,7 @@ class Enemy {
         itemToUse = this.inventory[i];
         console.log(itemToUse.count);
         if (itemToUse.count === 0) {
-          alert('You dont have enough to use that');
+          gameText.innerText = `The ${this.name} tried to use ${item}, but couldn't find one!`;
           return;
         } else {
           this.inventory[i].count--;
@@ -352,74 +377,67 @@ const changeTurn = () => {
     : (game.currentTurn = 'player');
 };
 
-// BATTLE FUNCTION
-// const battle = () => {
-//   updateStats();
-//   promptUser();
-// };
-
-// battle();
-
 //TURNS
-const enemyTurn = () => {
-  gameText.innerText = `The ${game.currentEnemy.name} is planning his next move!`;
-  document.addEventListener('keypress', e => {
-    if (game.currentEnemy.health > 35) {
-      const roll5 = dieRolls.roll5();
-      if (roll5 === 1) {
-        game.currentEnemy.useItem(game.currentEnemy.inventory[1].name);
-        changeTurn();
-        mainGame();
-      } else {
-        game.currentEnemy.attack(game.currentEnemy.weapon);
-        changeTurn();
-        mainGame();
-      }
-    } else {
-      const roll10 = dieRolls.roll10();
-      if (roll10 % 2 === 1 && game.currentEnemy.inventory[0].count > 0) {
-        game.currentEnemy.useItem(game.currentEnemy.inventory[0].name);
-        changeTurn();
-      } else {
-        if (roll10 <= 5 && game.currentEnemy.inventory[1].count > 0) {
-          game.currentEnemy.useItem(game.currentEnemy.inventory[1].name);
-          changeTurn();
-          mainGame();
-        } else {
-          game.currentEnemy.attack(game.currentEnemy.weapon);
-          changeTurn();
-          mainGame();
-        }
-      }
-    }
-  });
+const playerTurn = value => {
+  if (value === 'attack') {
+    hero.attack(game.currentEnemy, hero.weapon);
+  }
 };
 
-const mainGame = enemy => {
+const enemyTurn = () => {
+  gameText.innerText = `The ${game.currentEnemy.name} is planning his next move!`;
+  // if (game.currentEnemy.health > 35) {
+  //   const roll5 = dieRolls.roll5();
+  //   if (roll5 === 1) {
+  //     game.currentEnemy.useItem(game.currentEnemy.inventory[1].name);
+  //   } else {
+  //     game.currentEnemy.attack(game.currentEnemy.weapon);
+  //   }
+  // } else {
+  //   const roll10 = dieRolls.roll10();
+  //   if (roll10 % 2 === 1 && game.currentEnemy.inventory[0].count > 0) {
+  //     game.currentEnemy.useItem(game.currentEnemy.inventory[0].name);
+  //   } else {
+  //     if (roll10 <= 5 && game.currentEnemy.inventory[1].count > 0) {
+  //       game.currentEnemy.useItem(game.currentEnemy.inventory[1].name);
+  //     } else {
+  //       game.currentEnemy.attack(game.currentEnemy.weapon);
+  //     }
+  //   }
+  // }
+  game.currentEnemy.attack(game.currentEnemy.weapon);
+};
+
+const playRound = () => {
+  let value = '';
+  console.log(game.currentTurn);
+  if (game.currentTurn !== 'player') {
+    value = '';
+    enemyTurn();
+  } else {
+    playerInput.value = '';
+    playerInput.focus();
+    gameText.innerText = dialog.spotEnemy;
+    document.addEventListener('keydown', e => {
+      if (e.keyCode === 13 && playerInput.value !== '') {
+        e.preventDefault();
+        value = playerInput.value.toLowerCase();
+        console.log(value);
+        playerInput.value = '';
+        playerInput.focus();
+        playerTurn(value);
+      } else if (e.keyCode === 13 && playerInput.value === '' && value === '') {
+        e.preventDefault();
+        alert(`Please provide a response!`);
+      }
+    });
+  }
+};
+
+const mainGame = () => {
   updateStats(hero, game.currentEnemy);
   if (game.play) {
-    if (game.currentTurn !== 'player') {
-      enemyTurn();
-    } else {
-      playerInput.focus();
-      gameText.innerText = dialog.spotEnemy;
-      document.addEventListener('keypress', e => {
-        if (e.keyCode === 13 && playerInput.value !== '') {
-          e.preventDefault();
-          let value = playerInput.value.toLowerCase();
-          console.log(value);
-          playerInput.value = '';
-          playerInput.focus();
-          if (value === 'attack') {
-            hero.attack(game.currentEnemy, hero.weapon);
-            mainGame();
-          }
-        } else if (e.keyCode === 13 && playerInput.value !== '') {
-          e.preventDefault();
-          null;
-        }
-      });
-    }
+    playRound();
   }
 };
 
