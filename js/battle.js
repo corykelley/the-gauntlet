@@ -4,7 +4,7 @@ let healthDisplay = document.getElementById('health');
 let enemyWeaponDisplay = document.getElementById('enemy-weapon');
 let enemyHealthDisplay = document.getElementById('enemy-health');
 let enemyNameDisplay = document.getElementById('enemy-name');
-let progressBtn = document.getElementById('progress');
+let btnDiv = document.getElementById('button-div');
 let playerInput = document.getElementById('player-input');
 let gameText = document.getElementById('game-text');
 let inputValue = '';
@@ -80,26 +80,39 @@ class Player {
       enemy.health -= enemyHealthLost;
       if (weapon.type !== 'Weapon') {
         updateStats(hero, game.currentEnemy);
-        gameText.innerText = `You used a ${weapon.name}, it dealt ${enemyHealthLost} damage!`;
         weapon.count--;
-        progressBtn.addEventListener('click', () => {
+        removeAllChildNodes(btnDiv);
+        const btn = createButton();
+        btnDiv.append(btn);
+        btn.addEventListener('click', () => {
           changeTurn();
         });
+        gameText.innerText = `You used a ${weapon.name}, it dealt ${enemyHealthLost} damage!`;
       } else {
         updateStats(hero, game.currentEnemy);
-        gameText.innerText = `You struck the ${enemy.name}, he lost ${enemyHealthLost} health!`;
         console.log(`Hero Health: ${this.health}`);
         console.log(`${enemy.name} Health: ${enemy.health}`);
-        progressBtn.addEventListener('click', () => {
+        removeAllChildNodes(btnDiv);
+        const btn = createButton();
+        btnDiv.append(btn);
+        btn.addEventListener('click', () => {
           changeTurn();
         });
+        gameText.innerText = `You struck the ${enemy.name}, he lost ${enemyHealthLost} health!`;
       }
     } else {
       updateStats(hero, game.currentEnemy);
-      gameText.innerText = `You missed!`;
-      progressBtn.addEventListener('click', () => {
+      removeAllChildNodes(btnDiv);
+      const btn = createButton();
+      btnDiv.append(btn);
+      btn.addEventListener('click', () => {
         changeTurn();
       });
+      if (weapon.type !== 'Weapon') {
+        gameText.innerText = `You fumbled the ${weapon.name} and were unable to use it!`;
+      } else {
+        gameText.innerText = `You missed!`;
+      }
     }
   }
 
@@ -110,9 +123,14 @@ class Player {
       if (this.inventory[i].name === item) {
         itemToUse = this.inventory[i];
         console.log(itemToUse.count);
-        if (itemToUse.count === 0) {
-          alert('You have none of that item left!');
-          return;
+        if (itemToUse.count < 1) {
+          gameText.innerText = `As you quickly pull from your sack, you notice you have none of that item left! The ${game.currentEnemy.name} is angry and coming right for you!`;
+          removeAllChildNodes(btnDiv);
+          const btn = createButton();
+          btnDiv.append(btn);
+          btn.addEventListener('click', () => {
+            changeTurn();
+          });
         } else {
           console.log(`Count gone down`, this.inventory);
           if (itemToUse.type === 'Light') {
@@ -125,23 +143,60 @@ class Player {
     }
   }
 
+  whichItem() {
+    playerInput.value = '';
+    playerInput.focus();
+    gameText.innerText =
+      'Which item would you like to use? OPTIONS: (p)otion, (s)mall bomb?';
+    removeAllChildNodes(btnDiv);
+    const btn = createButton();
+    btnDiv.append(btn);
+    btn.addEventListener('click', () => {
+      inputValue = playerInput.value.toLowerCase();
+      console.log(inputValue);
+      if (inputValue === 'potion' || inputValue === 'p') {
+        hero.useItem('potion');
+        playerInput.value = '';
+      } else if (inputValue === 'small bomb' || inputValue === 's') {
+        hero.useItem('small bomb');
+        playerInput.value = '';
+      }
+    });
+  }
+
   heal(item) {
     const healingPoints = item.value;
     if (this.health === 100) {
-      alert(`You're already at full health!`);
+      gameText.innerText = `You're already at full health!`;
+      removeAllChildNodes(btnDiv);
+      const btn = createButton();
+      btnDiv.append(btn);
+      btn.addEventListener('click', () => {
+        playerTurn();
+      });
     } else if (this.health + healingPoints > 100) {
       this.health = 100;
-      alert(
-        `You've healed yourself by ${healingPoints} points. Your health is now at ${this.health}.`
-      );
-      item.count--;
+      removeAllChildNodes(btnDiv);
+      const btn = createButton();
+      btnDiv.append(btn);
+      btn.addEventListener('click', () => {
+        item.count--;
+        updateStats(hero, game.currentEnemy);
+        changeTurn();
+      });
+      gameText.innerText = `You've healed yourself by ${healingPoints} points. Your health is now at ${this.health}.`;
       console.log(this.inventory);
     } else {
       this.health += healingPoints;
-      alert(
-        `You've healed yourself by ${healingPoints} points. Your health is now at ${this.health}.`
-      );
-      item.count--;
+      removeAllChildNodes(btnDiv);
+      const btn = createButton();
+      btnDiv.append(btn);
+      btn.addEventListener('click', () => {
+        item.count--;
+        updateStats(hero, game.currentEnemy);
+        changeTurn();
+      });
+      gameText.innerText = `You've healed yourself by ${healingPoints} points. Your health is now at ${this.health}.`;
     }
   }
 }
@@ -161,7 +216,7 @@ const hero = new Player(
       name: 'Small Bomb',
       count: 2,
       type: 'Dark',
-      damage: 80,
+      damage: 30,
       display: true,
     },
   ],
@@ -205,26 +260,35 @@ class Enemy {
       hero.health -= playerHealthLost;
       if (weapon.type !== 'Weapon') {
         updateStats(hero, game.currentEnemy);
-        gameText.innerText = `The ${this.name} used a ${weapon.name}, it dealt ${playerHealthLost} damage!`;
         weapon.count--;
-        progressBtn.addEventListener('click', () => {
+        removeAllChildNodes(btnDiv);
+        const btn = createButton();
+        btnDiv.append(btn);
+        btn.addEventListener('click', () => {
           changeTurn();
         });
+        gameText.innerText = `The ${this.name} used a ${weapon.name}, it dealt ${playerHealthLost} damage!`;
       } else {
         updateStats(hero, game.currentEnemy);
-        gameText.innerText = `The ${this.name} struck you, you lost ${playerHealthLost} health!`;
         console.log(`Hero Health: ${hero.health}`);
         console.log(`${this.name} Health: ${this.health}`);
-        progressBtn.addEventListener('click', () => {
+        removeAllChildNodes(btnDiv);
+        const btn = createButton();
+        btnDiv.append(btn);
+        btn.addEventListener('click', () => {
           changeTurn();
         });
+        gameText.innerText = `The ${this.name} struck you, you lost ${playerHealthLost} health!`;
       }
     } else {
       updateStats(hero, game.currentEnemy);
-      gameText.innerText = `${this.name} missed!`;
-      progressBtn.addEventListener('click', () => {
+      removeAllChildNodes(btnDiv);
+      const btn = createButton();
+      btnDiv.append(btn);
+      btn.addEventListener('click', () => {
         changeTurn();
       });
+      gameText.innerText = `${this.name} missed!`;
     }
   }
 
@@ -235,7 +299,7 @@ class Enemy {
       if (this.inventory[i].name === item) {
         itemToUse = this.inventory[i];
         console.log(itemToUse.count);
-        if (itemToUse.count === 0) {
+        if (itemToUse.count < 1) {
           gameText.innerText = `The ${this.name} tried to use ${item}, but couldn't find one!`;
           return;
         } else {
@@ -256,9 +320,11 @@ class Enemy {
     if (this.health + healingPoints > 100) {
       this.health = 100;
       gameText.innerText = `The ${this.name} casts a healing spell, his health is now at ${this.health}.`;
+      changeTurn();
     } else {
       this.health += healingPoints;
       gameText.innerText = `The ${this.name} casts a healing spell, his health is now at ${this.health}.`;
+      changeTurn();
     }
   }
 }
@@ -367,8 +433,10 @@ const updateStats = (player, enemy) => {
 };
 
 const changeTurn = () => {
-  gameText.innerText = 'You regroup and get ready for more fight!';
-  progressBtn.addEventListener('click', () => {
+  removeAllChildNodes(btnDiv);
+  const btn = createButton();
+  btnDiv.append(btn);
+  btn.addEventListener('click', () => {
     if (game.currentTurn === 'player') {
       game.currentTurn = 'enemy';
       playRound();
@@ -377,6 +445,20 @@ const changeTurn = () => {
       playRound();
     }
   });
+  gameText.innerText = 'You regroup and get ready for more fight!';
+};
+
+const createButton = function () {
+  const btn = document.createElement('button');
+  btn.innerText = '->';
+  btn.classList.add('progress-btn');
+  return btn;
+};
+
+const removeAllChildNodes = function (parent) {
+  while (parent.firstChild) {
+    parent.removeChild(parent.firstChild);
+  }
 };
 
 //TURNS
@@ -384,11 +466,17 @@ const playerTurn = () => {
   playerInput.value = '';
   playerInput.focus();
   gameText.innerText = dialog.spotEnemy;
-  progressBtn.addEventListener('click', () => {
+  removeAllChildNodes(btnDiv);
+  const btn = createButton();
+  btnDiv.append(btn);
+  btn.addEventListener('click', () => {
     inputValue = playerInput.value.toLowerCase();
     console.log(inputValue);
-    if (inputValue === 'attack') {
+    if (inputValue === 'attack' || inputValue === 'a') {
       hero.attack(game.currentEnemy, hero.weapon);
+      playerInput.value = '';
+    } else if (inputValue === 'use item' || inputValue === 'u') {
+      hero.whichItem();
       playerInput.value = '';
     }
   });
@@ -396,7 +484,10 @@ const playerTurn = () => {
 
 const enemyTurn = () => {
   gameText.innerText = `The ${game.currentEnemy.name} is planning his next move!`;
-  progressBtn.addEventListener('click', () => {
+  removeAllChildNodes(btnDiv);
+  const btn = createButton();
+  btnDiv.append(btn);
+  btn.addEventListener('click', () => {
     if (game.currentEnemy.health > 35) {
       const roll5 = dieRolls.roll5();
       if (roll5 === 1) {
