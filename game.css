@@ -15,15 +15,19 @@ body,
 button {
   font-family: 'VT323', monospace;
   font-size: 20px;
-  letter-spacing: 1.5px;
+  letter-spacing: 1.6px;
 }
 
 button:hover {
   cursor: pointer;
 }
 
+ul {
+  list-style: none;
+}
+
 .main-container {
-  margin: 2rem auto 3rem;
+  margin: 1.5rem auto 0;
   width: 90vw;
   max-width: 1250px;
 }
@@ -31,7 +35,7 @@ button:hover {
 .display {
   display: flex;
   flex-direction: column;
-  margin: 1rem auto;
+  margin: 0.7rem auto;
 }
 
 .action-stats {
@@ -52,8 +56,8 @@ button:hover {
 }
 
 .game-info {
-  height: 200px;
-  margin: 0 0.5rem 0.5rem;
+  height: 150px;
+  margin: 0 0.5rem;
   display: flex;
   flex-direction: row;
   padding: 0.5rem;
@@ -62,4 +66,51 @@ button:hover {
 .game-info .text {
   flex-grow: 1;
   margin-right: 0.5rem;
+}
+
+.player-stats,
+.enemy-stats {
+  padding-right: 100px;
+}
+
+.player-stats hr,
+.enemy-stats hr {
+  margin: 0.2rem 0;
+}
+
+.text hr {
+  margin: 1rem 0;
+  width: 80%;
+}
+
+.progress-btn,
+button {
+  width: 100%;
+  background: none;
+  color: whitesmoke;
+  border: 1px solid whitesmoke;
+  font-family: 'VT323', monospace;
+  margin-top: 2rem;
+  padding: 0.5rem;
+}
+
+#health,
+#enemy-health {
+  background-color: whitesmoke;
+  height: 10px;
+  position: relative;
+  right: 8px;
+}
+
+#player-input {
+  caret-color: whitesmoke;
+  color: whitesmoke;
+  background: none;
+  font-size: 1.5rem;
+  border: 1px whitesmoke solid;
+  font-family: 'VT323', monospace;
+}
+
+#game-text {
+  font-size: 1.6rem;
 }
