@@ -27,7 +27,7 @@ ul {
 }
 
 .main-container {
-  margin: 1.5rem auto 0;
+  margin: 1.5rem auto 1rem;
   width: 90vw;
   max-width: 1250px;
 }
@@ -56,7 +56,6 @@ ul {
 }
 
 .game-info {
-  height: 150px;
   margin: 0 0.5rem;
   display: flex;
   flex-direction: row;
@@ -113,4 +112,18 @@ button {
 
 #game-text {
   font-size: 1.6rem;
+}
+
+@media only screen and (max-width: 500px) {
+  .game-info {
+    flex-direction: column;
+  }
+
+  #player-input {
+    margin-top: 1.5rem;
+  }
+
+  #button-div {
+    margin-bottom: 1rem;
+  }
 }
