@@ -7,8 +7,8 @@
 }
 
 body {
-  background-color: #111;
-  color: whitesmoke;
+  background-color: #323232;
+  color: #e4e4e4;
 }
 
 body,
@@ -16,6 +16,34 @@ button {
   font-family: 'VT323', monospace;
   font-size: 20px;
   letter-spacing: 1.6px;
+}
+
+.title-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 15rem;
+  flex-direction: column;
+}
+
+.large-title {
+  font-size: 9rem;
+}
+
+.start-btn {
+  background: none;
+  color: #e4e4e4;
+  border: 1px solid #e4e4e4;
+  font-family: 'VT323', monospace;
+  margin-top: 2rem;
+  padding: 0.5rem;
+  width: 30%;
+  text-align: center;
+  text-decoration: none;
+}
+
+.start-btn:hover {
+  cursor: pointer;
 }
 
 button:hover {
@@ -86,8 +114,8 @@ ul {
 button {
   width: 100%;
   background: none;
-  color: whitesmoke;
-  border: 1px solid whitesmoke;
+  color: #e4e4e4;
+  border: 1px solid #e4e4e4;
   font-family: 'VT323', monospace;
   margin-top: 2rem;
   padding: 0.5rem;
@@ -95,15 +123,14 @@ button {
 
 #health,
 #enemy-health {
-  background-color: whitesmoke;
+  background-color: #e4e4e4;
   height: 10px;
   position: relative;
   right: 8px;
 }
 
 #player-input {
-  caret-color: whitesmoke;
-  color: whitesmoke;
+  color: #e4e4e4;
   background: none;
   font-size: 1.5rem;
   border: 1px whitesmoke solid;
@@ -112,6 +139,10 @@ button {
 
 #game-text {
   font-size: 1.6rem;
+}
+
+img {
+  width: 30%;
 }
 
 @media only screen and (max-width: 500px) {

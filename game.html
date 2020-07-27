@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="game.css" />
+    <title>The Gauntlet ⚔️</title>
+  </head>
+  <body>
+    <main class="main-container">
+      <h1>The Gauntlet</h1>
+      <div class="display">
+        <div class="action-stats">
+          <div class="action">
+            <img src="img/ogre_run_anim_f2.png" alt="" />
+          </div>
+          <div class="stats">
+            <div class="player-stats">
+              <h2>Knight</h2>
+              <hr />
+              <h3>Weapon:</h3>
+              <p id="weapon"></p>
+              <h3>Health:</h3>
+              <div id="health"></div>
+              <h3>Inventory:</h3>
+              <ul id="inventory"></ul>
+            </div>
+            <div class="enemy-stats">
+              <h2 id="enemy-name">Enemy</h2>
+              <hr />
+              <h3>Weapon:</h3>
+              <p id="enemy-weapon"></p>
+              <h3>Health:</h3>
+              <div id="enemy-health"></div>
+            </div>
+          </div>
+        </div>
+        <div class="game-info">
+          <div class="text">
+            <p id="game-text">Game info and text info go here!</p>
+            <hr />
+            <p>Press 'ACTION' to continue!</p>
+          </div>
+          <div class="input">
+            <input id="player-input" type="text" />
+            <div id="button-div"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <!-- <script src="../js/game.js"></script> -->
+    <script src="battle.js"></script>
+  </body>
+</html>
