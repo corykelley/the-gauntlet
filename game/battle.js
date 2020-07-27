@@ -479,7 +479,7 @@ const updateStats = (player, enemy) => {
     enemyNameDisplay.innerText = enemy.name;
   } else if (hero.health < 0) {
     weaponDisplay.innerText = player.weapon.name;
-    healthDisplay.style.width = 'DEAD';
+    healthDisplay.style.width = '1%';
     getInventory();
     enemyWeaponDisplay.innerText = enemy.weapon.name;
     enemyHealthDisplay.style.width = `${enemy.health}%`;
@@ -488,17 +488,17 @@ const updateStats = (player, enemy) => {
     const btn = document.createElement('button');
     btn.innerText = 'PLAY AGAIN';
     btnDiv.append(btn);
+    gameImage.setAttribute('src', photos.heartEmpty);
+    gameText.innerText = `You've been defeated! All hope is lost for the kingdom...`;
     btn.addEventListener('click', () => {
       resetGame();
     });
-    gameImage.setAttribute('src', photos.heartEmpty);
-    gameText.innerText = `You've been defeated! All hope is lost for the kingdom...`;
   } else {
     weaponDisplay.innerText = player.weapon.name;
     healthDisplay.style.width = `${player.health}%`;
     getInventory();
     enemyWeaponDisplay.innerText = enemy.weapon.name;
-    enemyHealthDisplay.style.width = `DEAD`;
+    enemyHealthDisplay.style.width = `1%`;
     enemyNameDisplay.innerText = enemy.name;
     removeAllChildNodes(btnDiv);
     const btn = document.createElement('button');
@@ -507,8 +507,7 @@ const updateStats = (player, enemy) => {
     btn.addEventListener('click', () => {
       resetGame();
     });
-    gameImage.setAttribute('src', photos.chest);
-    gameText.innerText = `The ${game.currentEnemy.name} has perished! You live to fight another day!`;
+    game.currentEnemy.gameText.innerText = `The ${game.currentEnemy.name} has perished! You live to fight another day!`;
   }
 };
 
